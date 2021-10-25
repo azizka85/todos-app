@@ -1,0 +1,24 @@
+{
+  "name": "todos-app",
+  "version": "0.1.0",
+  "description": "Todo list app",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -cw"
+  },
+  "keywords": [
+    "JavaScript",
+    "Todos"
+  ],
+  "author": "Aziz Kudaikulov (aziz.kudaikulov@gmail.com)",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@azizka/todos": "^0.8.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.0.5",
+    "rollup": "^2.58.0",
+    "rollup-plugin-serve": "^1.1.0"
+  }
+}

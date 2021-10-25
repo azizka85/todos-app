@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.ico">
+  <title>Todos app</title>
+  <script src="todos-0.8.5.js"></script>
+</head>
+<body>
+  <ul data-todos>
+    <li data-todos-header></li>
+  </ul>
+  <p d>
+    <i d-header></i>
+    <i d-list>
+      <i d-list-header>
+        <i d-list-header-input></i>
+        <i d-list-header-expander-down-icon></i>
+        <i d-list-header-expander-right-icon></i>
+      </i>
+      <i d-list-item>
+        <i d-list-item-checkbox></i>
+        <i d-list-item-container></i>        
+      </i>
+      <i d-list-footer>
+        <i d-list-footer-container></i>
+        <i d-list-footer-btn-all></i>
+        <i d-list-footer-btn-active></i>
+        <i d-list-footer-btn-completed></i>
+        <i d-list-footer-btn-clear-completed></i>
+      </i>
+    </i>
+  </p>
+  <script>
+    TodosModule.TodosGlobals.todosClassName = 'c';
+    TodosModule.TodosGlobals.todosDataName = 'd';
+
+    const components = TodosModule.Todos.init();
+
+    const todos = new TodosModule.Todos();
+
+    todos.list.addItem('Todo #1', false);
+    todos.list.addItem('Todo #2', true);
+    todos.list.addItem('Todo #3', true);
+    todos.list.addItem('Todo #4', false);
+    todos.list.addItem('Todo #5', true);
+    
+    document.body.appendChild(todos.component);
+  </script>  
+</body>
+</html>
