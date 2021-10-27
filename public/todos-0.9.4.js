@@ -63,6 +63,10 @@
       return this.todosListFooterClassName + '-button';
     }
 
+    static get todosListFooterButtonActiveClassName() {
+      return this.todosListFooterButtonClassName + '-active';
+    }
+
     static get todosListFooterDataName() {
       return this.todosListDataName + '-footer';
     }
@@ -91,6 +95,10 @@
     /* ---------------- TodoItem ------------------ */
     static get todoItemClassName() {
       return this.todosListClassName + '-item';
+    }
+
+    static get todoItemCheckedClassName() {
+      return this.todoItemClassName + '-checked';
     }
 
     static get todoItemDataName() {
@@ -150,7 +158,7 @@
 
       if(this._checkbox) {
         this._checkbox.checked = props?.completed ?? false;
-        this._checkbox.addEventListener('change', (event) => props?.onTodoStatusChange?.(event));
+        this._checkbox.addEventListener('change', () => props?.onTodoStatusChange?.(this));
       }
 
       if(this._container) {
@@ -237,14 +245,12 @@
         this._input = elem.querySelector(`[${TodosGlobals.todosListHeaderInputDataName}]`);
       }
 
-      const cmp = this;
-
       if(this._iconRight) {
-        this._iconRight.addEventListener('click', () => cmp.display = true);
+        this._iconRight.addEventListener('click', () => this.display = true);
       }
 
       if(this._iconDown) {
-        this._iconDown.addEventListener('click', () => cmp.display = false);
+        this._iconDown.addEventListener('click', () => this.display = false);
       }
 
       if(this._input) {
@@ -322,6 +328,8 @@
 
     _createInput() {
       this._input = document.createElement('input');
+
+      this._input.placeholder = 'What needs to be done?';
 
       this.component.appendChild(this._input);
     }
@@ -444,6 +452,7 @@
     _createClearCompletedBtn() {
       this._clearCompletedBtn = document.createElement('div');
       this._clearCompletedBtn.classList.add(TodosGlobals.todosListFooterButtonClassName);
+      this._clearCompletedBtn.classList.add(TodosGlobals.todosListFooterButtonActiveClassName);
       this._clearCompletedBtn.textContent = 'Clear completed';
 
       this.component.appendChild(this._clearCompletedBtn);
@@ -465,10 +474,15 @@
     _footer = null;  
     _itemTemplate = null;
 
+    _mode = null;
+    _props = null;
+
     _items = [];
 
-    constructor(elem) {
+    constructor(elem, props) {
       super(elem, 'ul', TodosGlobals.todosListClassName);
+
+      this._props = props;
 
       const headerProps = {
         onDisplayChanged: this._changeListDisplay.bind(this),
@@ -476,8 +490,8 @@
       };
 
       const footerProps = {
-        onChangeDisplayMode: this._changeDisplayMode.bind(this),
-        onClearCompleted: this._clearCompleted.bind(this)
+        onChangeDisplayMode: this.changeDisplayMode.bind(this),
+        onClearCompleted: this.clearCompleted.bind(this)
       };
 
       const itemProps = {
@@ -502,7 +516,16 @@
       }
 
       this._changeListDisplay();
-      this._changeFooterContent();
+      this._changeFooterContent();   
+      this.changeDisplayMode(TodosListDisplayMode.All); 
+    }
+
+    get props() {
+      return this._props;
+    }
+
+    get mode() {
+      return this._mode;
     }
 
     get header() {
@@ -528,27 +551,75 @@
         onTodoStatusChange: this._todoStatusChanged.bind(this)
       };
 
-      const item = new TodoItem(null, itemProps);
+      const elem = this._itemTemplate?.cloneNode?.(true);
+
+      const item = new TodoItem(elem, itemProps);
 
       this._addTodoItemComponent(item);
+      this._changeItemDisplayMode(item);
 
       this._items.push(item);
 
       this._changeFooterContent();
+      this._props?.onDataChanged?.();
 
       return item;
     }
 
     removeItems(items) {
       this._removeItems(items, true);
+
+      this._changeFooterContent();
+
+      this._props?.onDataChanged?.();
     }
 
-    _addTodoItemComponent(item) {
-      if(this._footer) {
-        this.component.insertBefore(item.component, this._footer.component);
-      } else {
-        this.component.appendChild(item.component);
+    changeDisplayMode(mode) {
+      if(this._mode !== mode) {
+        this._mode = mode;
+
+        for(let item of this._items) {
+          this._changeItemDisplayMode(item);
+        }
       }
+
+      if(this._footer) {
+        if(this._footer.displayAllBtn) {
+          if(this._mode === TodosListDisplayMode.All) {
+            this._footer.displayAllBtn.classList?.add?.(TodosGlobals.todosListFooterButtonActiveClassName);
+          } else {
+            this._footer.displayAllBtn.classList?.remove?.(TodosGlobals.todosListFooterButtonActiveClassName);
+          }
+        }
+
+        if(this._footer.displayActiveBtn) {
+          if(this._mode === TodosListDisplayMode.Active) {
+            this._footer.displayActiveBtn.classList?.add?.(TodosGlobals.todosListFooterButtonActiveClassName);
+          } else {
+            this._footer.displayActiveBtn.classList?.remove?.(TodosGlobals.todosListFooterButtonActiveClassName);
+          }
+        }
+
+        if(this._footer.displayCompletedBtn) {
+          if(this._mode === TodosListDisplayMode.Completed) {
+            this._footer.displayCompletedBtn.classList?.add?.(TodosGlobals.todosListFooterButtonActiveClassName);
+          } else {
+            this._footer.displayCompletedBtn.classList?.remove?.(TodosGlobals.todosListFooterButtonActiveClassName);
+          }
+        }
+      }
+    }
+
+    clearCompleted() {
+      const items = [];
+
+      for(let item of this._items) {
+        if(item.checkbox?.checked) {
+          items.push(item);
+        }
+      }
+
+      this.removeItems(items);
     }
 
     _removeItems(items, fromArray) {
@@ -556,11 +627,17 @@
         const index = this._items.indexOf(item);
         if(index >= 0) {
           this.component.removeChild(item.component);
-          if(fromArray) this._items.splice(index, 1);
+          if(fromArray) this._items.splice(index, 1);        
         }
       }
+    }
 
-      this._changeFooterContent();
+    _addTodoItemComponent(item) {
+      if(this._footer) {
+        this.component.insertBefore(item.component, this._footer.component);
+      } else {
+        this.component.appendChild(item.component);
+      }    
     }
 
     _createHeader(props) {
@@ -576,7 +653,7 @@
     }
     
     _changeListDisplay() {
-      if(this._header.display) {
+      if(this._header?.display ?? true) {
         for(let item of this._items) {
           this._addTodoItemComponent(item);
         }
@@ -591,23 +668,32 @@
       }
     }
 
-    _changeDisplayMode(mode) {
-      console.log(mode);
+    _changeItemDisplayMode(item) {
+      item.component.style.display = 
+        this._mode === TodosListDisplayMode.All 
+          || (this._mode === TodosListDisplayMode.Completed && item.checkbox?.checked)
+          || (this._mode === TodosListDisplayMode.Active && !item.checkbox?.checked)
+        ? ''
+        : 'none';
+
+      if(item.checkbox?.checked) {    
+        item.component.classList.add(TodosGlobals.todoItemCheckedClassName);
+      } else {
+        item.component.classList.remove(TodosGlobals.todoItemCheckedClassName);
+      }      
     }
 
-    _clearCompleted() {
-      console.log('Clear completed');
+    _todoStatusChanged(item) {
+      this._changeItemDisplayMode(item); 
+
+      this._props?.onDataChanged?.();
     }
 
-    _todoStatusChanged(event) {
-      console.log(event);
-    }
-
-    static init(todosElem) {
+    static init(todosElem, props) {
       const elem = todosElem.querySelector(`[${TodosGlobals.todosListDataName}]`);
 
       if(elem) {
-        return new TodosList(elem);
+        return new TodosList(elem, props);
       } else {
         return null;
       }    
@@ -618,15 +704,15 @@
     _header = null;
     _list = null;
 
-    constructor(elem) {
+    constructor(elem, props) {
       super(elem, 'div', TodosGlobals.todosClassName);
 
       if(!elem) {
         this._createHeader();
-        this._createList();
+        this._createList(props);
       } else {
         this._header = elem.querySelector(`[${TodosGlobals.todosHeaderDataName}]`);
-        this._list = TodosList.init(elem);
+        this._list = TodosList.init(elem, props);
       }
     }
 
@@ -642,22 +728,24 @@
       this._header = document.createElement('div');
       this._header.classList.add(TodosGlobals.todosHeaderClassName);
 
+      this._header.textContent = 'todos';
+
       this.component.appendChild(this._header);
     }
 
-    _createList() {
-      this._list = new TodosList();
+    _createList(props) {
+      this._list = new TodosList(null, props);
 
       this.component.appendChild(this._list.component);
     }
 
-    static init() {
+    static init(props) {
       const elems = document.querySelectorAll(`[${TodosGlobals.todosDataName}]`);
 
       const todosRoots = [];
 
       for(let elem of elems) {
-        const todos = new Todos(elem);
+        const todos = new Todos(elem, props);
 
         todosRoots.push(todos);
       }
@@ -681,4 +769,4 @@
   }
 
 })();
-//# sourceMappingURL=todos-0.8.5.js.map
+//# sourceMappingURL=todos-0.9.4.js.map

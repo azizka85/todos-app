@@ -1,0 +1,171 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+.todos {
+  background: linear-gradient(#ffffff, #dddddd);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.todos-header {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  color: #dddddd;
+  font-weight: lighter;    
+}
+
+.todos-list {
+  padding: 0;
+  margin: 0;
+  width: calc(100% - 2rem);
+  background: #ffffff;
+  box-shadow: 0 0 10px #dddddd;  
+}
+
+@media screen and (min-width: 25rem) {
+  .todos-header {
+    font-size: 3rem;
+  }  
+}
+
+@media screen and (min-width: 50rem) {
+  .todos-header {
+    font-size: 4rem;
+  }  
+  .todos-list {
+    width: 40rem;
+  }
+}
+
+.todos-list li {
+  list-style: none;
+  padding: 1rem 0.5rem;
+  border-bottom: 1px solid #dddddd;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.todos-list-header span {
+  width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
+  margin-right: 1rem;
+}
+
+.todos-list-header span svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: #dddddd;
+}
+
+.todos-list-header input {
+  font-size: 1.5rem;
+  color: #777777;
+  border: none;
+  outline: none;
+  font-weight: lighter;  
+}
+
+.todos-list-header input::placeholder {
+  color: #bbbbbb;
+}
+
+.todos-list-item label {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-right: 1.5rem;
+  cursor: pointer;
+  height: 2rem;
+  width: 2rem;
+  user-select: none;
+}
+
+.todos-list-item label input {
+  position: absolute;
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
+.todos-list-item label span {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  left: 0;
+  height: 2rem;
+  width: 2rem;
+  background: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 1rem;
+}
+
+.todos-list-item label:hover input ~ span {
+  border-color: #b3d7ff;
+}
+
+.todos-list-item label:hover input:active ~ span {
+  background: #b3d7ff;
+}
+
+.todos-list-item label input:focus ~ span {
+  box-shadow: 0 0 0 0.125rem #b3d7ff;
+}
+
+.todos-list-item label span svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: #b3d7ff;
+  display: none;
+}
+
+.todos-list-item-checked label span svg {
+  display: block;
+}
+
+.todos-list-item span {
+  text-decoration: none;
+  color: #777777;
+}
+
+.todos-list-item-checked span {
+  text-decoration: line-through;
+  color: #bbbbbb;
+}
+
+.todos-list li.todos-list-footer {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  justify-content: space-between;
+  background: #f9f9f9;
+}
+
+.todos-list-footer-buttons {
+  display: flex;
+  align-items: center;  
+}
+
+.todos-list-footer-buttons div+div {
+  margin-left: 0.5rem;
+}
+
+.todos-list-footer-button {
+  cursor: pointer;
+  border: none;
+  padding: none;
+}
+
+.todos-list-footer-button-active {
+  border: 2px solid #dddddd;
+  padding: 0.25rem;
+}

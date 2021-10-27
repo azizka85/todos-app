@@ -5,49 +5,41 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="todos-0.9.4.css">
   <title>Todos app</title>
-  <script src="todos-0.8.5.js"></script>
+  <script src="todos-0.9.4.js"></script>
 </head>
-<body>
-  <ul data-todos>
-    <li data-todos-header></li>
-  </ul>
-  <p d>
-    <i d-header></i>
-    <i d-list>
-      <i d-list-header>
-        <i d-list-header-input></i>
-        <i d-list-header-expander-down-icon></i>
-        <i d-list-header-expander-right-icon></i>
-      </i>
-      <i d-list-item>
-        <i d-list-item-checkbox></i>
-        <i d-list-item-container></i>        
-      </i>
-      <i d-list-footer>
-        <i d-list-footer-container></i>
-        <i d-list-footer-btn-all></i>
-        <i d-list-footer-btn-active></i>
-        <i d-list-footer-btn-completed></i>
-        <i d-list-footer-btn-clear-completed></i>
-      </i>
-    </i>
-  </p>
+<body> 
   <script>
-    TodosModule.TodosGlobals.todosClassName = 'c';
-    TodosModule.TodosGlobals.todosDataName = 'd';
+    const todos = new TodosModule.Todos(null, {});
 
-    const components = TodosModule.Todos.init();
+    let items;
 
-    const todos = new TodosModule.Todos();
+    try {
+      items = JSON.parse(localStorage.getItem('todos')) ?? [];
+    } catch {
+      items = [];
+    }
 
-    todos.list.addItem('Todo #1', false);
-    todos.list.addItem('Todo #2', true);
-    todos.list.addItem('Todo #3', true);
-    todos.list.addItem('Todo #4', false);
-    todos.list.addItem('Todo #5', true);
+    for(let item of items) {
+      todos.list.addItem(item.title, item.completed);
+    }
     
     document.body.appendChild(todos.component);
+
+    todos.list.props.onDataChanged = () => {
+      let data = [];
+
+      for(let item of todos.list.items) {
+        data.push({
+          title: item.container?.textContent ?? '',
+          completed: item.checkbox?.checked ?? false
+        });
+      }
+
+      localStorage.setItem('todos', JSON.stringify(data));
+    };
   </script>  
 </body>
 </html>
