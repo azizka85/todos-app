@@ -6,40 +6,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="todos-0.9.4.css">
+  <link rel="stylesheet" href="todos-1.0.1.css">
   <title>Todos app</title>
-  <script src="todos-0.9.4.js"></script>
+  <script src="todos-1.0.1.js"></script>
 </head>
 <body> 
+  <div id="root"></div>
   <script>
-    const todos = new TodosModule.Todos(null, {});
+    const todos = new TodosModule.Todos(null, {
+      onCreateTodo: updateStorage,
+      onClearCompleted: updateStorage,
+      onTodoStatusChange: updateStorage
+    });
 
-    let items;
+    let data = [];
 
     try {
-      items = JSON.parse(localStorage.getItem('todos')) ?? [];
-    } catch {
-      items = [];
+      data = JSON.parse(localStorage.getItem('todos') ?? '[]') || [];
+    } catch {}
+
+    for(let item of data) {
+      todos.listComponent.addItem(item.title, item.completed);
     }
 
-    for(let item of items) {
-      todos.list.addItem(item.title, item.completed);
-    }
-    
-    document.body.appendChild(todos.component);
+    document.getElementById('root').appendChild(todos.elem);
 
-    todos.list.props.onDataChanged = () => {
-      let data = [];
+    function updateStorage() {
+      const data = [];
 
-      for(let item of todos.list.items) {
+      for(let item of todos.listComponent.itemsList) {
         data.push({
-          title: item.container?.textContent ?? '',
-          completed: item.checkbox?.checked ?? false
+          title: item.contentElem.textContent,
+          completed: item.checkboxElem.checked
         });
       }
 
       localStorage.setItem('todos', JSON.stringify(data));
-    };
-  </script>  
+    }
+
+    window.todos = todos;
+  </script> 
 </body>
 </html>

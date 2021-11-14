@@ -14,12 +14,14 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@azizka/todos": "^0.9.0"
+    "@azizka/todos": "^1.0.0"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.0.5",
     "rollup": "^2.58.0",
     "rollup-plugin-import-css": "^3.0.2",
-    "rollup-plugin-serve": "^1.1.0"
+    "rollup-plugin-serve": "^1.1.0",
+    "rollup-plugin-terser": "^7.0.2"
   }
 }
